@@ -1,10 +1,19 @@
-// src/middlewares/validateBird.js
-const { body, validationResult } = require("express-validator");
+const { body, validationResult } = require("express-validator"); // TODO : joi
 const moment = require("moment");
+// TODO : move
+const foo = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+};
+
 const validateBird = [
   body("name")
     .isString()
     .withMessage("Name must be a string")
+    .exists()
     .notEmpty()
     .withMessage("Name is required"),
 
@@ -17,15 +26,10 @@ const validateBird = [
       return true;
     })
     .withMessage("birthDate must be a Date")
+    .exists()
     .notEmpty()
     .withMessage("birthDate is required"),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
+  foo,
 ];
 
 module.exports = validateBird;
